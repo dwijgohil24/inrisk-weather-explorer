@@ -16,11 +16,20 @@ Built as a case study for InRisk Labs' Full Stack Engineer role.
 - `httpx` — for calling the Open-Meteo API.
 - `python-dotenv` — loads local config/credentials from `.env` (never committed).
 
+**Frontend**
+- **Next.js** (App Router) + plain **JavaScript** — TypeScript was deliberately skipped for
+  this project; starting React itself from zero, adding a type system on top at the same time
+  would have doubled what was being learned per line of code. Noted here as a scope decision,
+  not an oversight.
+- **Tailwind CSS v4** — CSS-first theming via an `@theme` block (no `tailwind.config.js`),
+  custom brand color palette and font wired up in `globals.css`.
+- **Recharts** — the temperature line chart.
+  
 **Cloud**
 - Google Cloud Storage (GCS) — object storage for the raw weather JSON.
-- GCP Cloud Run — planned deployment target for the backend (containerized). *(Not yet deployed.)*
+- GCP Cloud Run — planned deployment target for the backend (containerized).*
 
-## Architecture
+## Backend Architecture
  
 ```
 backend/
@@ -44,7 +53,29 @@ backend/
   .env                     # local secrets/config, gitignored
   secrets/key.json          # local-only GCS service account key, gitignored
 ```
+
+## Frontend Architecture
  
+```
+frontend/
+  src/
+    app/
+      layout.jsx              # root layout, loads Inter font via next/font/google
+      page.jsx                 # thin server component — header + <Dashboard />
+      globals.css               # Tailwind v4 @theme block: brand colors, warm accent, font
+    components/
+      Card.jsx                   # reusable card wrapper, shared styling
+      Dashboard.jsx                # client component — owns ALL shared state
+      InputPanel.jsx                # form -> POST /store-weather-data
+      FileList.jsx                   # presentational — renders stored files, no fetching
+      DailyTable.jsx                  # paginated table (10/20/50 rows)
+      TemperatureChart.jsx             # Recharts line chart
+    lib/
+      api.js                    # centralized fetch wrapper for every backend call
+      weather.js                 # shared transform: Open-Meteo arrays -> row objects
+  .env.local                  # NEXT_PUBLIC_API_URL, gitignored
+  package.json
+```
 Each piece has one job: `routes/` only handles HTTP concerns (parsing requests, returning
 responses); `clients/` only knows how to talk to an external service and raises its own
 domain-specific exceptions on failure (`OpenMeteoError`, `StorageError`,
@@ -74,6 +105,22 @@ Run the server:
 ```bash
 uvicorn app.main:app --reload
 ```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+```
+ 
+Create `frontend/.env.local` (gitignored):
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+ 
+```bash
+npm run dev
+```
+Open `http://localhost:3000`.
  
 - API docs: `http://localhost:8000/docs`
 - Health check: `http://localhost:8000/health`
