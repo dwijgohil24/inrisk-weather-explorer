@@ -12,3 +12,4 @@ node_modules/
 # secrets
 *service-account*.json
 *.key.json
+backend/secrets
