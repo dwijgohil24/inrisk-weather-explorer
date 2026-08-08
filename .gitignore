@@ -1,0 +1,14 @@
+# python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# node
+node_modules/
+.next/
+.env.local
+
+# secrets
+*service-account*.json
+*.key.json
