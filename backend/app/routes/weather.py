@@ -38,11 +38,4 @@ def list_weather_files():
 
 @router.get("/weather-file-content/{file}")
 def weather_file_content(file: str):
-    try:
-        data = read_json(file)
-    except FileNotFoundInBucket:
-        return JSONResponse(
-            status_code=404,
-            content={"status": "error", "message": "not found"},
-        )
-    return data
+    return read_json(file)
